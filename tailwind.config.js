@@ -13,6 +13,9 @@ module.exports = {
           pending: "var(--text-pending)",
           draft: "var(--text-draft)",
           access1: "var(--text-access)",
+          paid: "#33d69f",
+          pending: "#ff8f00",
+          draft: "#dfe3fa",
         },
       },
       backgroundColor: {
@@ -21,6 +24,12 @@ module.exports = {
           btn: "var(--btn-bg)",
           card: "var(--card-bg)",
           nav: "var(--nav-bg)",
+          paid_1: "#33d69f0f",
+          draft_1: "#dfe3fa0f",
+          pending_1: "#ff8f000f",
+          paid_2: "#33d69f",
+          draft_2: "#dfe3fa",
+          pending_2: "#ff8f00",
         },
       },
       backgroundImage: {
