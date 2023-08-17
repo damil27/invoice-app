@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import ShowData from "@/components/ShowData";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
+
 import Image from "next/image";
 
 export default function Home() {

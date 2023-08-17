@@ -30,6 +30,8 @@ module.exports = {
           paid_2: "#33d69f",
           draft_2: "#dfe3fa",
           pending_2: "#ff8f00",
+          total: "var(--total-bg)",
+          items: "var( --items-bg)",
         },
       },
       backgroundImage: {

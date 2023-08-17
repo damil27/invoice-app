@@ -43,6 +43,9 @@ body {
     --text-draft: rgb(225, 234, 253);
     --btn-bg: rgb(124, 93, 250);
     --card-bg: rgb(30, 33, 57);
+    --total-bg: rgb(0,0,0);
+    --items-bg: rgb(37,41,69);
+
 }
 [data-theme="light"] body {
   --main-bg: rgb(248, 248, 251);
@@ -53,6 +56,11 @@ body {
     --text-draft: rgb(225, 234, 253);
     --btn-bg: rgb(124, 93, 250);
     --card-bg: rgb(255, 255, 255);
+    --total-bg: rgb(55,65,81);
+     --items-bg: rgb(249,250,254);
+    
+
+    
 }
 [data-theme="dark"] body {
       --main-bg: rgb(20, 22, 37);
@@ -63,4 +71,8 @@ body {
     --text-draft: rgb(225, 234, 253);
     --btn-bg: rgb(124, 93, 250);
     --card-bg: rgb(30, 33, 57);
+    --total-bg: rgb(0,0,0);
+    --items-bg: rgb(37,41,69);
+
+
 }
