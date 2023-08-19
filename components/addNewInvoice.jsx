@@ -4,16 +4,15 @@
 
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { motion } from "framer-motion";
 
 const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
   // const data = useContext(DataContext);
   // const [global, setGLobal] = useState(data);
 
   const initial = {
-    id: "",
-    createdAt: "",
     paymentDue: "",
-    description: "R",
+    description: "",
     paymentTerms: "",
     clientName: " ",
     clientEmail: "",
@@ -33,12 +32,11 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
     items: [
       {
         name: "",
-        quantity: 1,
+        quantity: 0,
         price: 0,
         total: 0,
       },
     ],
-    total: 0,
   };
 
   useEffect(() => {
@@ -70,7 +68,6 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
     { text: "Next 30 day", value: 30 },
   ];
   const [inputData, setInputData] = useState({
-    id:initial.id,
     clientName: initial.clientName,
     clientEmail: initial.clientEmail,
     paymentDue: initial.paymentDue,
@@ -144,10 +141,19 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
   const newId = uuidv4().substr(0, 4);
 
   console.log(inputData);
+  const leftToRightAnimate = {
+    hidden: { x: "-100%" },
+    visible: { x: 0, transition: { duration: 0.5, ease: "easeInOut" } },
+  };
 
   return (
     <div className="fixed inset-0 z-40 bg-opacity-50 bg-[#000005be] flex justify-start md:left-[7rem] top-0 items-start modal-overlay">
-      <div className="bg-custom-base p-6 h-screen scrollbar-hide top-0 rounded-lg md:w-[700px] justify-center items-center flex flex-col w-full ">
+      <motion.div
+        variants={leftToRightAnimate}
+        initial="hidden"
+        animate="visible"
+        className="bg-custom-base p-6 h-screen scrollbar-hide top-0 rounded-lg md:w-[700px] justify-center items-center flex flex-col w-full "
+      >
         <h2 className="font-bold text-3xl mt-8">Invoice</h2>
         <div className="w-full p-4 overflow-y-scroll scrollbar-hide my-14">
           <h1 className="text-[14px] text-purple-400 font-light">Bill Form</h1>
@@ -160,9 +166,10 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                 </label>
                 <input
                   name="street"
+                  required
                   value={inputData.senderAddress.street}
                   onChange={handleSender}
-                  className="p-2 mt-2 bg-custom-card rounded-md focus:outline-purple-400 border-[.3px] focus:outline-none  "
+                  className="p-2 mt-2 bg-custom-card rounded-md focus:outline-purple-400 border-[.3px]    "
                 />
               </div>
               <div className="col-span-1 flex flex-col gap-1">
@@ -171,6 +178,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                 </label>
                 <input
                   name="city"
+                  required
                   value={inputData.senderAddress.city}
                   onChange={handleSender}
                   className="p-2 mt-2 rounded-md bg-custom-card focus:outline-purple-400 border-[.3px] focus:outline-none  "
@@ -181,6 +189,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                   PostCode
                 </label>
                 <input
+                  required
                   name="postCode"
                   value={inputData.senderAddress.postCode}
                   onChange={handleSender}
@@ -192,6 +201,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                   Country
                 </label>
                 <input
+                  required
                   name="country"
                   value={inputData.senderAddress.country}
                   onChange={handleSender}
@@ -207,6 +217,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                   Client Name
                 </label>
                 <input
+                  required
                   name="clientName"
                   value={inputData.clientName}
                   onChange={handleOnChange}
@@ -219,6 +230,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                   Client email
                 </label>
                 <input
+                  required
                   name="clientEmail"
                   value={inputData.clientEmail}
                   onChange={handleOnChange}
@@ -231,6 +243,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                   Client Address
                 </label>
                 <input
+                  required
                   name="street"
                   value={inputData.clientAddress.street}
                   onChange={handleClient}
@@ -243,6 +256,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                   City
                 </label>
                 <input
+                  required
                   name="city"
                   value={inputData.clientAddress.city}
                   onChange={handleClient}
@@ -254,6 +268,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                   PostCode
                 </label>
                 <input
+                  required
                   name="postCode"
                   value={inputData.clientAddress.postCode}
                   onChange={handleClient}
@@ -264,7 +279,10 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                 <label htmlFor="" className="text-gray-400 font-light">
                   Country
                 </label>
-                <input className="p-2 mt-2 bg-custom-card rounded-md focus:outline-purple-400 border-[.3px] focus:outline-none  " />
+                <input
+                  required
+                  className="p-2 mt-2 bg-custom-card rounded-md focus:outline-purple-400 border-[.3px] focus:outline-none  "
+                />
               </div>
               <div className="col-span-3">
                 <div className="grid grid-cols-2 gap-2">
@@ -273,6 +291,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                       Invoice Date
                     </label>
                     <input
+                      required
                       name="paymentDue"
                       value={inputData.paymentDue}
                       onChange={handleOnChange}
@@ -285,6 +304,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                       Payments Terms
                     </label>
                     <select
+                      required
                       name="paymentTerms"
                       value={inputData.paymentTerms}
                       onChange={handleOnChange}
@@ -304,6 +324,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                   Description
                 </label>
                 <input
+                  required="true"
                   name="description"
                   value={inputData.description}
                   onChange={handleOnChange}
@@ -324,6 +345,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                         Item Name
                       </label>
                       <input
+                        required
                         value={item.name}
                         onChange={(e) =>
                           handleItemChange(index, "name", e.target.value)
@@ -337,6 +359,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                         Qty.
                       </label>
                       <input
+                        required
                         type="number"
                         placeholder=""
                         value={item.quantity}
@@ -351,6 +374,7 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
                         Price
                       </label>
                       <input
+                        required
                         type="number"
                         value={item.price}
                         onChange={(e) => {
@@ -409,15 +433,15 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
           </button>
           <button
             onClick={(e) => {
-              setInputData((prev) => ({ ...prev, id: newId }));
-              handleOnSubmit(inputData,e);
+              // console.log("final", inputData);
+              handleOnSubmit(e, inputData);
             }}
             className="mt-4 bg-custom-btn  px-7 py-2 rounded-full"
           >
             Save Changes
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

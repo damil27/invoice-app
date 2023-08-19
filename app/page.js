@@ -3,6 +3,8 @@ import { Navbar } from "@/components/Navbar";
 import ShowData from "@/components/ShowData";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
+  import "react-toastify/dist/ReactToastify.css";
+
 
 import Image from "next/image";
 

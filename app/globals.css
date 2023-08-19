@@ -1,7 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+/* input:invalid {
+  border-color: red;
+} */
 @layer base {
   :root {
     --main-bg: rgb(20, 22, 37);

@@ -1,18 +1,108 @@
 "use client";
 
 import { DataContext } from "@/components/Provider";
-import { useContext } from "react";
+import Link from "next/link";
+import { useContext, useEffect, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import { motion } from "framer-motion";
 
 export default function Details({ params }) {
   const { details } = params;
-  const data = useContext(DataContext);
+  // const data = useContext(DataContext);
   // console.log(data)
-    const invoice = data.find((item) => item.id === details);
-    console.log(invoice.clientAddress.street)
+  const router = useRouter();
+  const [data, setData] = useState([]);
+  const [message, setMessage] = useState("");
+  async function fetchInvoice() {
+    try {
+      await axios
+        .get("http://localhost:3088/api/invoice/")
+        .then((response) => response.data)
+        .then((data) => setData(data.allInvoice))
+        .catch((error) => console.error("Error message", error));
+    } catch (error) {
+      console.error("error message ", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchInvoice();
+  }, []);
+
+  const invoice = data.find((item) => item.idTag === details);
+  if (!invoice) return <h2>Loading...</h2>;
+  console.log(invoice);
+  const amount = invoice.items.reduce((acc, item) => acc + item.total, 0);
+  const { _id } = invoice;
+  console.log("id modifies", _id);
+
+  async function handleDelete() {
+    const confirm = window.confirm(
+      `Are you sure you want to delete ${invoice.clientName} invoice?`
+    );
+    if (!confirm) return;
+    try {
+      await axios
+        .delete(`http://localhost:3088/api/invoice/${_id}`)
+        .then((response) => response.data)
+        .then((data) => {
+          console.log(data.message);
+          toast.success(data?.message, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+
+          router.push("/");
+        })
+        .catch((error) => console.error("error", error));
+    } catch (error) {}
+  }
+
+  async function handleMarkedPaid() {
+    const confirm = window.confirm(
+      `Are you sure you want to make ${invoice.clientName} invoice paid?`
+    );
+    if (!confirm) return;
+    try {
+      await axios
+        .put(`http://localhost:3088/api/invoice/${_id}`)
+        .then((response) => response.data)
+        .then((data) => {
+          // console.log(data.message)
+          // alert(data.message);
+          toast.success(data?.message, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          fetchInvoice();
+        });
+    } catch (error) {
+      console.error("error from server", error);
+    }
+  }
+
+  const motionEffect = {
+    initial: { y: 20, opacity: 0 },
+    animate: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5, type: "spring", stiffness: 12 },
+    },
+  };
+  // console.log(data)
+
   return (
-    <div className=" min-h-screen   flex items-start md:w-[60%] justify-center mx-auto ">
+    <motion.div
+      variants={motionEffect}
+      initial="initial"
+      animate="animate"
+      className=" min-h-screen   flex items-start md:w-[60%] justify-center mx-auto "
+    >
       <div className="md:mt-[3rem] gap-3 flex flex-col justify-center items-center w-full relative">
-        <h2>Back</h2>
+        <Link href="/" className="flex justify-center items-center gap-2 ">
+          {" "}
+          <img src="./icon-arrow-left.svg" /> Back
+        </Link>
         <div className="w-full md:h-[4.5rem]  flex  justify-center items-center  bg-custom-base rounded-lg ">
           <div className="flex justify-between w-full items-center mx-4">
             <div className="flex  items-center gap-3">
@@ -45,11 +135,17 @@ export default function Details({ params }) {
               <button className="text-gray-500 bg-custom-nav px-3 py-1 rounded-full ">
                 Edit
               </button>
-              <button className="bg-red-500 px-3 py-1 rounded-full ">
+              <button
+                onClick={handleDelete}
+                className="bg-red-500 px-3 py-1 text-white rounded-full "
+              >
                 Delete
               </button>
-              <button className="bg-purple-400 py-1 px-3 hidden md:block rounded-full ">
-                Mark paid
+              <button
+                onClick={handleMarkedPaid}
+                className="bg-purple-400 py-1 px-3 text-white hidden md:block rounded-full "
+              >
+                Mark as paid
               </button>
             </div>
           </div>
@@ -62,22 +158,25 @@ export default function Details({ params }) {
               <div className="flex flex-col items-start justify-start">
                 <h2 className="font-bold">
                   {" "}
-                  <span className="text-gray-400">#</span> {invoice.id}
+                  <span className="text-gray-400">#</span>{" "}
+                  {invoice.idTag.toUpperCase()}
                 </h2>
-                <p className="text-gray-400"> CLientName</p>
+                <p className="text-gray-400"> {invoice.clientName}</p>
               </div>
               <div className="flex flex-col  text-gray-400 justify-end items-end">
-                <p>{invoice.clientAddress.street}</p>
-                <p>{invoice.clientAddress.city}</p>
-                <p>{invoice.clientAddress.postCode}</p>
-                <p>{invoice.clientAddress.country}</p>
+                <p>{invoice.senderAddress.street}</p>
+                <p>{invoice.senderAddress.city}</p>
+                <p>{invoice.senderAddress.postCode}</p>
+                <p>{invoice.senderAddress.country}</p>
               </div>
             </div>
             {/* section two  */}
             <div className="grid grid-cols-4 md:grid-cols-6 w-full items-start justify-start mt-10">
               <div className="col-span-2 w-full grid grid-rows-5">
                 <div className="text-gray-400 font-light ">invoice Date</div>
-                <div className="font-bold text-2xl">{invoice.createdAt}</div>
+                <div className="font-bold text-[1.2rem]">
+                  {invoice.createdAt.substr(0, 10)}
+                </div>
                 <div></div>
                 <div className="text-gray-400 font-light ">payment Due</div>
                 <div className="font-bold text-[1.2rem]">
@@ -109,10 +208,13 @@ export default function Details({ params }) {
 
             <div className="grid bg-custom-card  w-full items-center pt-6 rounded-t-lg rounded-b-lg mt-20 ">
               {invoice.items.map((item, index) => (
-                <div key={index} className="grid grid-cols-4 md:grid-cols-8  bg-custom-card   mx-auto w-full pb-7">
+                <div
+                  key={index}
+                  className="grid grid-cols-4 md:grid-cols-8  bg-custom-card   mx-auto w-full pb-7"
+                >
                   <div className=" col-span-2 flex  flex-col items-center text-start w-full justify-start">
                     <h3 className="text-gray-400 text-start">Item name</h3>
-                    <p className="text-center">{item.name}</p>
+                    <p className="text-center">{item.clientName}</p>
                   </div>
                   <div className=" hidden col-span-2 md:flex md:flex-col md:items-center md:justify-start">
                     <h3 className="text-gray-400">Qty</h3>
@@ -133,7 +235,7 @@ export default function Details({ params }) {
                   <h2 className="text-white font-semibold text-2xl">Amount</h2>
                   <h2 className="text-white font-semibold text-2xl">
                     {" "}
-                    £{invoice.total}
+                    £{amount}
                   </h2>
                 </div>
               </div>
@@ -141,6 +243,6 @@ export default function Details({ params }) {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

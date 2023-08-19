@@ -4,21 +4,65 @@ import { useContext, useEffect, useState } from "react";
 import { DataContext } from "./Provider";
 import AddNewInvoice from "./addNewInvoice";
 import Link from "next/link";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import { motion } from "framer-motion";
 
 export const ContentSection = () => {
   const data = useContext(DataContext);
   const [openModal, setOpenModal] = useState(false);
   const [myData, setMyData] = useState([]);
   const [GlobalData, setGlobalData] = useState(data);
-  const handleOnSubmit = async (newData, e) => {
+  const [newData, setNewData] = useState([]);
+  // submit handler function
+  const handleOnSubmit = async (e, inputData) => {
     e.preventDefault();
     try {
-      setGlobalData((prev) => [newData, ...prev]);
-      setOpenModal(false);
+      await axios
+        .post("http://localhost:3088/api/invoice/", inputData)
+        .then((res) => {
+          console.log("Server data", res.data);
+
+          toast.success(res?.data?.message, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          setOpenModal(false);
+          fetchInvoice();
+        })
+        .catch((error) => console.log("error", error));
     } catch (error) {
-      console.error("error", error);
+      console.error("error message", error);
+      toast.error("Something went wrong, Please try again!");
     }
   };
+  // fetching data handler function
+  async function fetchInvoice() {
+    try {
+      await axios
+        .get("http://localhost:3088/api/invoice/")
+        .then((response) => response.data)
+        .then((data) => setNewData(data))
+        .catch((error) => console.error("Error message", error));
+    } catch (error) {
+      console.error("error message ", error);
+    }
+  }
+
+  const Invoices = newData.allInvoice;
+  console.log(Invoices && Invoices.length);
+  // motion handler
+  const motionEffect = {
+    initial: { y: 20, opacity: 0 },
+    animate: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5, type: "spring", stiffness: 10 },
+    },
+  };
+
+  useEffect(() => {
+    fetchInvoice();
+  }, []);
 
   return (
     <>
@@ -27,9 +71,12 @@ export const ContentSection = () => {
         <div className=" left-3 absolute">
           <h2 className="text-4xl font-bold">Invoice</h2>
           <p className="text-gray-500 hidden md:block ">
-            There are 7 total invoice
+            There are {Invoices && Invoices.length} invoice
           </p>
-          <p className="text-gray-500 md:hidden"> 7invoice</p>
+          <p className="text-gray-500 md:hidden">
+            {" "}
+            {Invoices && Invoices.length}invoice
+          </p>
         </div>
         <div className="flex gap-4 items-center justify-center">
           <div className="flex gap-4 items-center justify-center">
@@ -48,27 +95,74 @@ export const ContentSection = () => {
           </div>
         </div>
       </div>
-      GlobalData
-      {GlobalData.map((val, index) => {
-        const { id } = val;
-        return (
-          <Link className="w-full " key={index} href={`/${id}`}>
-            <div className="w-full md:h-[4.5rem]  flex  justify-center items-center  bg-custom-base rounded-lg hover:cursor-pointer hover:border-2 hover:border-purple-600 mb-6">
-              {/* desktop view  */}
-              <div className="hidden md:block w-full bg-custom-card rounded-lg ">
-                <div className="  flex    items-center justify-between p-3 w-full  ">
-                  <div className="flex  flex-col gap-2 md:flex-row items-center justify-start md:gap-6">
-                    <p className="font-bold">
-                      <span className="text-custom-access1">#</span>
-                      {val.id}
-                    </p>
-                    <p className=" text-sm font-thin text-custom-access1 ">
+      +{" "}
+      {Invoices &&
+        Invoices.map((val, index) => {
+          const { idTag } = val;
+          return (
+            <Link className="w-full " key={index} href={`/${idTag}`}>
+              <motion.div
+                className="w-full md:h-[4.5rem]  flex  justify-center items-center  bg-custom-base rounded-lg hover:cursor-pointer hover:border-2 hover:border-purple-600 mb-6"
+                variants={motionEffect}
+                initial="initial"
+                animate="animate"
+              >
+                {/* desktop view  */}
+                <div className="hidden md:block w-full bg-custom-card rounded-lg ">
+                  <div className="  flex    items-center justify-between p-3 w-full  ">
+                    <div className="flex  flex-col gap-2 md:flex-row items-center justify-start md:gap-6">
+                      <p className="font-bold">
+                        <span className="text-custom-access1">#</span>
+                        {val.id}
+                      </p>
+                      <p className=" text-sm font-thin text-custom-access1 ">
+                        Due {val.paymentDue}
+                      </p>
+                      <p className="text-sm font-thin">{val.clientName}</p>
+                    </div>
+                    <div className="flex items-center justify-center gap-5">
+                      <p className="font-bold text-2xl">${val.total}</p>
+                      <div className="flex items-center justify-end gap-3 bg-custom-paid_1 pl-5 pb-3 pt-3 pr-6 rounded-lg">
+                        <p
+                          className={
+                            val.status === "paid"
+                              ? "h-[10px] w-[10px] bg-custom-paid_2 rounded-full"
+                              : val.status === "pending"
+                              ? "h-[10px] w-[10px] bg-custom-pending_2 rounded-full"
+                              : "h-[10px] w-[10px] bg-custom-draft_2 rounded-full"
+                          }
+                        ></p>
+                        <p
+                          className={
+                            val.status === "paid"
+                              ? "text-custom-paid font-light text-sm"
+                              : val.status === "pending"
+                              ? "text-custom-pending font-light text-sm"
+                              : "text-custom-draft font-light text-sm"
+                          }
+                        >
+                          {" "}
+                          {val.status}
+                        </p>
+                      </div>
+                      <p>
+                        <img src="./icon-arrow-right.svg" alt="" />
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                {/* mobile view  */}
+                <div className="flex md:hidden   items-center justify-between p-5 w-full ">
+                  <div className="flex  flex-col gap-2 md:flex-row items-start justify-start md:gap-6">
+                    <p className="font-bold">{val.id}</p>
+                    <p className="text-sm font-thin text-custom-access1">
                       Due {val.paymentDue}
                     </p>
-                    <p className="text-sm font-thin">{val.clientName}</p>
+                    <p className="text-sm font-bold">${val.total}</p>
                   </div>
-                  <div className="flex items-center justify-center gap-5">
-                    <p className="font-bold text-2xl">${val.total}</p>
+                  <div className="flex flex-col items-center justify-center gap-5">
+                    <p className="text-sm font-thin">{val.clientName}</p>
+
                     <div className="flex items-center justify-end gap-3 bg-custom-paid_1 pl-5 pb-3 pt-3 pr-6 rounded-lg">
                       <p
                         className={
@@ -92,53 +186,12 @@ export const ContentSection = () => {
                         {val.status}
                       </p>
                     </div>
-                    <p>
-                      <img src="./icon-arrow-right.svg" alt="" />
-                    </p>
                   </div>
                 </div>
-              </div>
-              {/* mobile view  */}
-              <div className="flex md:hidden   items-center justify-between p-5 w-full ">
-                <div className="flex  flex-col gap-2 md:flex-row items-start justify-start md:gap-6">
-                  <p className="font-bold">{val.id}</p>
-                  <p className="text-sm font-thin text-custom-access1">
-                    Due {val.paymentDue}
-                  </p>
-                  <p className="text-sm font-bold">${val.total}</p>
-                </div>
-                <div className="flex flex-col items-center justify-center gap-5">
-                  <p className="text-sm font-thin">{val.clientName}</p>
-
-                  <div className="flex items-center justify-end gap-3 bg-custom-paid_1 pl-5 pb-3 pt-3 pr-6 rounded-lg">
-                    <p
-                      className={
-                        val.status === "paid"
-                          ? "h-[10px] w-[10px] bg-custom-paid_2 rounded-full"
-                          : val.status === "pending"
-                          ? "h-[10px] w-[10px] bg-custom-pending_2 rounded-full"
-                          : "h-[10px] w-[10px] bg-custom-draft_2 rounded-full"
-                      }
-                    ></p>
-                    <p
-                      className={
-                        val.status === "paid"
-                          ? "text-custom-paid font-light text-sm"
-                          : val.status === "pending"
-                          ? "text-custom-pending font-light text-sm"
-                          : "text-custom-draft font-light text-sm"
-                      }
-                    >
-                      {" "}
-                      {val.status}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Link>
-        );
-      })}
+              </motion.div>
+            </Link>
+          );
+        })}
       {openModal && (
         <AddNewInvoice
           handleOnSubmit={handleOnSubmit}
