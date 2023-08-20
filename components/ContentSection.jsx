@@ -9,14 +9,13 @@ import { ToastContainer, toast } from "react-toastify";
 import { motion } from "framer-motion";
 
 export const ContentSection = () => {
-  const data = useContext(DataContext);
+  // const data = useContext(DataContext);
   const [openModal, setOpenModal] = useState(false);
-  const [myData, setMyData] = useState([]);
-  const [GlobalData, setGlobalData] = useState(data);
   const [newData, setNewData] = useState([]);
   // submit handler function
   const handleOnSubmit = async (e, inputData) => {
     e.preventDefault();
+    
     try {
       await axios
         .post("http://localhost:3088/api/invoice/", inputData)
@@ -95,7 +94,7 @@ export const ContentSection = () => {
           </div>
         </div>
       </div>
-      +{" "}
+
       {Invoices &&
         Invoices.map((val, index) => {
           const { idTag } = val;

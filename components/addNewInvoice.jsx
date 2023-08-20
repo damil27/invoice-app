@@ -7,10 +7,13 @@ import { v4 as uuidv4 } from "uuid";
 import { motion } from "framer-motion";
 
 const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
-  // const data = useContext(DataContext);
-  // const [global, setGLobal] = useState(data);
-
-  const initial = {
+  const deliveryPeriod = [
+    { text: "Next 1 day", value: 1 },
+    { text: "Next 7 day", value: 7 },
+    { text: "Next 14 day", value: 14 },
+    { text: "Next 30 day", value: 30 },
+  ];
+  const [inputData, setInputData] = useState({
     paymentDue: "",
     description: "",
     paymentTerms: "",
@@ -37,7 +40,8 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
         total: 0,
       },
     ],
-  };
+  });
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -60,26 +64,6 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
       window.addEventListener("click", handleOverlayCLose);
     };
   }, [closeModal]);
-
-  const deliveryPeriod = [
-    { text: "Next 1 day", value: 1 },
-    { text: "Next 7 day", value: 7 },
-    { text: "Next 14 day", value: 14 },
-    { text: "Next 30 day", value: 30 },
-  ];
-  const [inputData, setInputData] = useState({
-    clientName: initial.clientName,
-    clientEmail: initial.clientEmail,
-    paymentDue: initial.paymentDue,
-    description: initial.description,
-    paymentTerms: initial.paymentTerms,
-    status: initial.status,
-    paymentTerms: initial.paymentTerms,
-    description: initial.description,
-    senderAddress: { ...initial.senderAddress },
-    clientAddress: { ...initial.clientAddress },
-    items: [...initial.items],
-  });
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
@@ -145,7 +129,12 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
     hidden: { x: "-100%" },
     visible: { x: 0, transition: { duration: 0.5, ease: "easeInOut" } },
   };
+  const { clientName, clientEmail, paymentDue, description, paymentTerm } =
+    inputData;
 
+  const validation = () => {
+   
+  };
   return (
     <div className="fixed inset-0 z-40 bg-opacity-50 bg-[#000005be] flex justify-start md:left-[7rem] top-0 items-start modal-overlay">
       <motion.div
@@ -434,6 +423,19 @@ const AddNewInvoice = ({ closeModal, handleOnSubmit }) => {
           <button
             onClick={(e) => {
               // console.log("final", inputData);
+               const requiredFields = [
+                 "clientName",
+                 "clientEmail",
+                 "paymentDue",
+                 "description",
+                 "paymentDue",
+               ];
+               for (const field of requiredFields) {
+                 if (!inputData[field]) {
+                   alert(`Please fill in the ${field} field`);
+                   return;
+                 }
+               }
               handleOnSubmit(e, inputData);
             }}
             className="mt-4 bg-custom-btn  px-7 py-2 rounded-full"
