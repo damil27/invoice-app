@@ -15,10 +15,10 @@ export const ContentSection = () => {
   // submit handler function
   const handleOnSubmit = async (e, inputData) => {
     e.preventDefault();
-    
+
     try {
       await axios
-        .post("http://localhost:3088/api/invoice/", inputData)
+        .post("https://invoice-api2.onrender.com/api/invoice/", inputData)
         .then((res) => {
           console.log("Server data", res.data);
 
@@ -38,7 +38,7 @@ export const ContentSection = () => {
   async function fetchInvoice() {
     try {
       await axios
-        .get("http://localhost:3088/api/invoice/")
+        .get("https://invoice-api2.onrender.com/api/invoice/")
         .then((response) => response.data)
         .then((data) => setNewData(data))
         .catch((error) => console.error("Error message", error));
@@ -46,6 +46,9 @@ export const ContentSection = () => {
       console.error("error message ", error);
     }
   }
+  useEffect(() => {
+    fetchInvoice();
+  }, []);
 
   const Invoices = newData.allInvoice;
   console.log(Invoices && Invoices.length);
@@ -58,10 +61,7 @@ export const ContentSection = () => {
       transition: { duration: 0.5, type: "spring", stiffness: 10 },
     },
   };
-
-  useEffect(() => {
-    fetchInvoice();
-  }, []);
+  if (!Invoices) return <h2 className="text-2xl">Loading ... Please wait!</h2>;
 
   return (
     <>

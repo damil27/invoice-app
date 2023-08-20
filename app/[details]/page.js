@@ -18,7 +18,7 @@ export default function Details({ params }) {
   async function fetchInvoice() {
     try {
       await axios
-        .get("http://localhost:3088/api/invoice/")
+        .get("https://invoice-api2.onrender.com/api/invoice/")
         .then((response) => response.data)
         .then((data) => setData(data.allInvoice))
         .catch((error) => console.error("Error message", error));
@@ -32,12 +32,13 @@ export default function Details({ params }) {
   }, []);
 
   const invoice = data.find((item) => item.idTag === details);
-  if (!invoice) return <h2>Loading...</h2>;
+  if (!invoice) return <h2 className="text-2xl">Loading... Please wait!!!</h2>;
   console.log(invoice);
   const amount = invoice.items.reduce((acc, item) => acc + item.total, 0);
   const { _id } = invoice;
   console.log("id modifies", _id);
 
+  // Delete function
   async function handleDelete() {
     const confirm = window.confirm(
       `Are you sure you want to delete ${invoice.clientName} invoice?`
@@ -45,7 +46,7 @@ export default function Details({ params }) {
     if (!confirm) return;
     try {
       await axios
-        .delete(`http://localhost:3088/api/invoice/${_id}`)
+        .delete(`https://invoice-api2.onrender.com/api/invoice/${_id}`)
         .then((response) => response.data)
         .then((data) => {
           console.log(data.message);
@@ -66,7 +67,7 @@ export default function Details({ params }) {
     if (!confirm) return;
     try {
       await axios
-        .put(`http://localhost:3088/api/invoice/${_id}`)
+        .put(`https://invoice-api2.onrender.com/api/invoice//${_id}`)
         .then((response) => response.data)
         .then((data) => {
           // console.log(data.message)
