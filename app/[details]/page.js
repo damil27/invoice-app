@@ -7,6 +7,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import { motion } from "framer-motion";
+import Spinner from "@/components/Spinner";
 
 export default function Details({ params }) {
   const { details } = params;
@@ -32,7 +33,7 @@ export default function Details({ params }) {
   }, []);
 
   const invoice = data.find((item) => item.idTag === details);
-  if (!invoice) return <h2 className="text-2xl">Loading... Please wait!!!</h2>;
+  if (!invoice) return <Spinner />;
   console.log(invoice);
   const amount = invoice.items.reduce((acc, item) => acc + item.total, 0);
   const { _id } = invoice;

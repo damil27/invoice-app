@@ -7,6 +7,7 @@ import Link from "next/link";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { motion } from "framer-motion";
+import Spinner from "./Spinner";
 
 export const ContentSection = () => {
   // const data = useContext(DataContext);
@@ -61,7 +62,7 @@ export const ContentSection = () => {
       transition: { duration: 0.5, type: "spring", stiffness: 10 },
     },
   };
-  if (!Invoices) return <h2 className="text-2xl">Loading ... Please wait!</h2>;
+  if (!Invoices) return <Spinner /> ;
 
   return (
     <>
